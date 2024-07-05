@@ -11,7 +11,7 @@ Future<VerifyPaymentResponse> verifyPayment(
   final dio = dioParm ?? Dio();
 
   // Altera o origin para se fazer passar pela verify_payment
-  String origin = "https://pay.ideiasinovadoras.ao";
+  String origin = "https://pay.fasma.ao";
   dio.options.headers = {"Origin": origin};
 
   // prepara o documento para ser enviado
@@ -21,7 +21,7 @@ Future<VerifyPaymentResponse> verifyPayment(
 
   try {
     final result = await dio.post(
-      'https://pay.ideiasinovadoras.ao/query.php',
+      'https://pay.fasma.ao/query.php',
       data: formData,
     );
 
@@ -31,7 +31,7 @@ Future<VerifyPaymentResponse> verifyPayment(
       return VerifyPaymentSuccess.fromMap(result.data);
     }
 
-    final errorCodeList = [403, 404, 406, 415];
+    final errorCodeList = [422, 403, 404, 406, 415];
     if (result.data['STATUS'] != null && statusIsError(errorCodeList, result)) {
       return VerifyPaymentError(
         status: result.data['STATUS'] as int,
@@ -45,6 +45,8 @@ Future<VerifyPaymentResponse> verifyPayment(
       log: 'Ocorreu um erro desconhecido ao analisar o comprovante.',
     );
   } catch (e) {
+    print(e);
+    rethrow;
     throw FailOnVerifyPayment(
         'Erro inesperado ao verificar o comprovante. \nErro: ${e.toString()}');
   }

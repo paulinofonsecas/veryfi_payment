@@ -1,18 +1,21 @@
 import 'dart:io';
 
-import 'package:verify_payment/verify_payment.dart' as verify_payment;
-import 'package:verify_payment/models/response_model.dart';
 import 'package:test/test.dart';
+import 'package:verify_payment/models/response_model.dart';
+import 'package:verify_payment/verify_payment.dart' as verify_payment;
 
 void main() {
   test('verify doc', () async {
-    final fileName = 'test/docs/comprovativo_20240416_205409_7563966245_signed.pdf';
+    final fileName = 'test/docs/DOC-20240603-WA0007..pdf';
     final file = File(fileName);
 
     final response = await verify_payment.verifyPayment(file);
 
+    print(response);
+
     expect(response, isA<VerifyPaymentSuccess>());
-    expect((response as VerifyPaymentSuccess).status, 423);
+    expect((response as VerifyPaymentSuccess).dINHEIRO, greaterThan(0));
+    expect((response).sTATUS, 200);
   });
 
   test('Erro, documento que nao e comprovante', () async {
@@ -22,11 +25,12 @@ void main() {
     final response = await verify_payment.verifyPayment(file);
 
     expect(response, isA<VerifyPaymentError>());
-    expect((response as VerifyPaymentError).status, 406);
+    expect((response as VerifyPaymentError).status, 422);
   });
 
   test('Erro, documento que nao e pdf', () async {
-    final fileName = 'test/docs/Roteiro do Curso de Algoritmos (6 Semanas).docx';
+    final fileName =
+        'test/docs/Roteiro do Curso de Algoritmos (6 Semanas).docx';
     final file = File(fileName);
 
     final response = await verify_payment.verifyPayment(file);
